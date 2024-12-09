@@ -1,8 +1,8 @@
-import axios from 'axios';
 import React, { useContext, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
 import { AuthContext } from '../contexts/AuthContext';
+import axiosInstance from '../utils/axiosInstance'; // Use the axiosInstance
 
 const LoginPage = ({ navigation }) => {
     const { login } = useContext(AuthContext);
@@ -28,7 +28,7 @@ const LoginPage = ({ navigation }) => {
         setIsLoading(true);
         setError('');
         try {
-            const response = await axios.post('http://192.168.1.202:3007/api/users/signup', {
+            const response = await axiosInstance.post('/users/signup', {
                 username,
                 password,
             });
