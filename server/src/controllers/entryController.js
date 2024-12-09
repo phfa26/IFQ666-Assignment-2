@@ -17,7 +17,9 @@ exports.addEntry = (req, res) => {
 
 exports.updateEntry = (req, res) => {
     const { response } = req.body;
+    console.log(response)
     db.run(`UPDATE entries SET response = ? WHERE id = ? AND user_id = ?`, [response, req.params.id, req.user.id], function (err) {
+
         if (err) return res.status(500).json({ error: err.message });
         res.json({ updated: this.changes });
     });

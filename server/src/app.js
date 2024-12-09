@@ -5,10 +5,10 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const logger = require('./middleware/logger');
-const userRoutes = require('./routes/userRoutes');
-const entryRoutes = require('./routes/entryRoutes');
-const settingsRoutes = require('./routes/settingsRoutes');
+const logger = require('./middleware/logger.js');
+const userRoutes = require('./routes/userRoutes.js');
+const entryRoutes = require('./routes/entryRoutes.js');
+const settingsRoutes = require('./routes/settingsRoutes.js');
 
 const app = express();
 app.use(cors());
