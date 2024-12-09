@@ -1,4 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react';
+import { MD3DarkTheme, MD3LightTheme, Provider as PaperProvider } from 'react-native-paper';
 import { getFromSecureStore, saveToSecureStore } from '../utils/secureStore';
 
 export const ThemeContext = createContext();
@@ -32,7 +33,9 @@ export const ThemeProvider = ({ children }) => {
 
     return (
         <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
-            {children}
+            <PaperProvider theme={isDarkMode ? MD3DarkTheme : MD3LightTheme}>
+                {children}
+            </PaperProvider>
         </ThemeContext.Provider>
     );
 };

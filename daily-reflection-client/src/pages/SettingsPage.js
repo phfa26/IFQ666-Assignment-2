@@ -1,13 +1,14 @@
-import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { Button, Switch, Text, TextInput } from 'react-native-paper';
+import { Button, Switch, Text, TextInput, useTheme } from 'react-native-paper';
 import { AuthContext } from '../contexts/AuthContext';
 import { ThemeContext } from '../contexts/ThemeContext';
+import axiosInstance from '../utils/axiosInstance'; // Use the axiosInstance
+
 
 const SettingsPage = () => {
     const { toggleTheme, isDarkMode } = useContext(ThemeContext);;
-    const { token, logout } = useContext(AuthContext);
+    const { logout } = useContext(AuthContext);
 
     const [fontSize, setFontSize] = useState(16);
     const [reminderTime, setReminderTime] = useState('09:00');
@@ -15,14 +16,15 @@ const SettingsPage = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState('');
 
+    const { colors } = useTheme();
+
     // Fetch current settings from the API
     const fetchSettings = async () => {
         try {
             setLoading(true);
             setError('');
-            const response = await axios.get('http://192.168.1.202:3007/api/settings', {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            const response = await axiosInstance.get('/settings');
+            console.log('Settings fetched:', response.data); // Debugging
             const { font_size, reminder_time } = response.data;
             setFontSize(font_size || 16);
             setReminderTime(reminder_time || '09:00');
@@ -39,10 +41,8 @@ const SettingsPage = () => {
         try {
             setIsSaving(true);
             setError('');
-            await axios.put(
-                'http://192.168.1.202:3007/api/settings',
+            await axiosInstance.put('/settings',
                 { font_size: fontSize, reminder_time: reminderTime },
-                { headers: { Authorization: `Bearer ${token}` } }
             );
             alert('Settings saved successfully!');
         } catch (error) {
@@ -59,7 +59,7 @@ const SettingsPage = () => {
 
     if (loading) {
         return (
-            <View style={styles.loadingContainer}>
+            <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
                 <ActivityIndicator size="large" />
                 <Text>Loading Settings...</Text>
             </View>
@@ -67,20 +67,20 @@ const SettingsPage = () => {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             {/* Error Fallback */}
             {error && <Text style={styles.errorText}>{error}</Text>}
 
             {!error && (
                 <>
                     {/* Theme Toggle */}
-                    <View style={styles.row}>
+                    <View style={[styles.row, { backgroundColor: colors.background }]}>
                         <Text style={styles.label}>Enable Dark Mode</Text>
                         <Switch value={isDarkMode} onValueChange={toggleTheme} />
                     </View>
 
                     {/* Font Size Setting */}
-                    <View style={styles.row}>
+                    <View style={[styles.row, { backgroundColor: colors.background }]}>
                         <Text style={styles.label}>Font Size: {fontSize}</Text>
                         <Button mode="outlined" onPress={() => setFontSize((prev) => Math.max(prev - 1, 12))}>
                             -
