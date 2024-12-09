@@ -2,7 +2,6 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
-import { ThemeContext } from '../contexts/ThemeContext'; // Assuming you have a ThemeContext
 import AboutPage from '../pages/AboutPage';
 import HomePage from '../pages/HomePage';
 import LoginPage from '../pages/LoginPage';
@@ -13,7 +12,6 @@ const Drawer = createDrawerNavigator();
 
 const AppNavigator = () => {
     const { isLoggedIn } = useContext(AuthContext);
-    const { isDarkMode, toggleTheme } = useContext(ThemeContext); // Access theme context
     const [isAppReady, setIsAppReady] = useState(false);
 
     useEffect(() => {
