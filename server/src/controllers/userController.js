@@ -40,7 +40,7 @@ exports.signup = async (req, res) => {
                         // Step 4: Add default settings for the new user
                         db.run(
                             `INSERT INTO settings (user_id, font_size, reminder_time) VALUES (?, ?, ?)`,
-                            [userId, 16, '09:00'], // Default values
+                            [this.lastID, 16, '09:00'], // Default values
                             (err) => {
                                 if (err) {
                                     return res.status(500).json({ error: 'Failed to add default settings.' });

@@ -7,16 +7,15 @@ import axiosInstance from '../utils/axiosInstance'; // Use the axiosInstance
 
 
 const SettingsPage = () => {
-    const { toggleTheme, isDarkMode } = useContext(ThemeContext);;
+    const { toggleTheme, isDarkMode, updateFontSize } = useContext(ThemeContext);;
     const { logout } = useContext(AuthContext);
 
-    const [fontSize, setFontSize] = useState(16);
     const [reminderTime, setReminderTime] = useState('09:00');
     const [loading, setLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState('');
 
-    const { colors } = useTheme();
+    const { fontSize, colors } = useTheme();
 
     // Fetch current settings from the API
     const fetchSettings = async () => {
@@ -24,10 +23,9 @@ const SettingsPage = () => {
             setLoading(true);
             setError('');
             const response = await axiosInstance.get('/settings');
-            console.log('Settings fetched:', response.data); // Debugging
             const { font_size, reminder_time } = response.data;
-            setFontSize(font_size || 16);
             setReminderTime(reminder_time || '09:00');
+            updateFontSize(font_size || 16)
         } catch (error) {
             console.error('Failed to fetch settings:', error);
             setError('Failed to load settings. Please try again later.');
@@ -39,11 +37,17 @@ const SettingsPage = () => {
     // Save updated settings to the API
     const saveSettings = async () => {
         try {
+            if (!fontSize || typeof fontSize !== 'number' || isNaN(fontSize)) {
+                setError('Invalid font size. Please correct it.');
+                return;
+            }
+
             setIsSaving(true);
             setError('');
-            await axiosInstance.put('/settings',
-                { font_size: fontSize, reminder_time: reminderTime },
-            );
+            await axiosInstance.put('/settings', {
+                font_size: fontSize,
+                reminder_time: reminderTime,
+            });
             alert('Settings saved successfully!');
         } catch (error) {
             console.error('Failed to save settings:', error);
@@ -82,10 +86,10 @@ const SettingsPage = () => {
                     {/* Font Size Setting */}
                     <View style={[styles.row, { backgroundColor: colors.background }]}>
                         <Text style={styles.label}>Font Size: {fontSize}</Text>
-                        <Button mode="outlined" onPress={() => setFontSize((prev) => Math.max(prev - 1, 12))}>
+                        <Button mode="outlined" onPress={() => updateFontSize(Math.max(fontSize - 1, 16))}>
                             -
                         </Button>
-                        <Button mode="outlined" onPress={() => setFontSize((prev) => Math.min(prev + 1, 24))}>
+                        <Button mode="outlined" onPress={() => updateFontSize(Math.min(fontSize + 1, 32))}>
                             +
                         </Button>
                     </View>

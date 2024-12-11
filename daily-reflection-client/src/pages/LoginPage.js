@@ -4,6 +4,7 @@ import { Button, Text, TextInput } from 'react-native-paper';
 import { AuthContext } from '../contexts/AuthContext';
 import axiosInstance from '../utils/axiosInstance'; // Use the axiosInstance
 
+
 const LoginPage = ({ navigation }) => {
     const { login } = useContext(AuthContext);
     const [username, setUsername] = useState('');
@@ -16,6 +17,7 @@ const LoginPage = ({ navigation }) => {
     // Handle login functionality
     const handleLogin = async () => {
         try {
+            console
             await login(username, password);
             navigation.replace('Home');
         } catch (err) {

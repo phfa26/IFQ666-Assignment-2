@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Card, Text } from 'react-native-paper';
+import { Button, Card, Text, useTheme } from 'react-native-paper';
 import EntryModal from '../components/EntryModal'; // Import the EntryModal for editing and adding entries
 import axiosInstance from '../utils/axiosInstance'; // Use the axiosInstance
 
@@ -10,7 +10,10 @@ const HomePage = () => {
     const [newQuestion, setNewQuestion] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [selectedEntry, setSelectedEntry] = useState(null);  // Store selected entry for editing
+    const [selectedEntry, setSelectedEntry] = useState(null); // Store selected entry for editing
+    
+    const { colors } = useTheme(); // Access the theme colors
+    const styles = useDynamicStyles(colors);
 
     const fetchEntries = async () => {
         try {
@@ -33,8 +36,6 @@ const HomePage = () => {
             // Check if we are editing an existing entry or adding a new one
             if (selectedEntry) {
                 // Update the existing entry
-                                console.log('edit +++++')
-
                 await axiosInstance.put(`/entries/${selectedEntry.id}`, {
                     question: newQuestion,
                     response,
@@ -42,7 +43,6 @@ const HomePage = () => {
                 });
             } else {
                 // Add a new entry
-                console.log('new +++++ c', question)
                 await axiosInstance.post('/entries', {
                     question,
                     response,
@@ -106,8 +106,13 @@ const HomePage = () => {
     }, []);
 
     return (
-        <View style={styles.container}>
-            <Button mode="contained" onPress={() => openModal(null)} style={styles.addButton}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <Button
+                mode="contained"
+                onPress={() => openModal(null)}
+                style={[styles.addButton, { backgroundColor: colors.primary }]}
+                labelStyle={{ color: colors.onPrimary }}
+            >
                 Add New Entry
             </Button>
 
@@ -121,23 +126,32 @@ const HomePage = () => {
 
             {loading && (
                 <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" />
-                    <Text>Loading Entries...</Text>
+                    <ActivityIndicator size="large" color={colors.primary} />
+                    <Text style={{ color: colors.onBackground }}>Loading Entries...</Text>
                 </View>
             )}
 
-            {error && <Text style={styles.errorText}>{error}</Text>}
+            {error && <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>}
 
             {!loading && !error && (
-                <ScrollView style={styles.scrollView}>
+                <ScrollView key={colors.background} style={styles.scrollView}>
                     {entries.length === 0 ? (
-                        <Text style={styles.errorText}>No entries available</Text>
+                        <Text style={[styles.errorText, { color: colors.onBackground }]}>No entries available</Text>
                     ) : (
                         entries.map((entry, index) => (
-                            <Card key={index} style={styles.entryCard} onPress={() => openModal(entry)}>
-                                <Card.Title title={entry.question} subtitle={entry.date} />
+                            <Card
+                                key={index}
+                                style={[styles.entryCard, { backgroundColor: colors.surface }]}
+                                onPress={() => openModal(entry)}
+                            >
+                                <Card.Title
+                                    title={entry.question}
+                                    subtitle={entry.date}
+                                    titleStyle={{ color: colors.primary }}
+                                    subtitleStyle={{ color: colors.onBackground }}
+                                />
                                 <Card.Content>
-                                    <Text>{entry.response}</Text>
+                                    <Text style={{ color: colors.onBackground }}>{entry.response}</Text>
                                 </Card.Content>
                             </Card>
                         ))
@@ -148,13 +162,34 @@ const HomePage = () => {
     );
 };
 
-const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f5f5f5', padding: 10 },
-    addButton: { marginBottom: 10 },
-    scrollView: { flex: 1 },
-    entryCard: { marginBottom: 10 },
-    loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    errorText: { color: 'red', textAlign: 'center', marginVertical: 10 },
-});
+const useDynamicStyles = (colors) =>
+    StyleSheet.create({
+        container: {
+            flex: 1,
+            padding: 10,
+            backgroundColor: colors.background,
+        },
+        addButton: {
+            marginBottom: 10,
+            backgroundColor: colors.primary,
+        },
+        scrollView: {
+            flex: 1,
+        },
+        entryCard: {
+            marginBottom: 10,
+            backgroundColor: colors.surface,
+        },
+        loadingContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        errorText: {
+            textAlign: 'center',
+            marginVertical: 10,
+            color: colors.error,
+        },
+    });
 
 export default HomePage;

@@ -1,8 +1,9 @@
-import axios from 'axios';
 import React, { createContext, useEffect, useState } from 'react';
+import axiosInstance from '../utils/axiosInstance'; // Use the axiosInstance
 import { deleteFromSecureStore, getFromSecureStore, saveToSecureStore } from '../utils/secureStore';
 
 export const AuthContext = createContext();
+let logoutCallback;
 
 export const AuthProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -21,7 +22,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (username, password) => {
         try {
-            const response = await axios.post('http://192.168.1.202:3007/api/users/login', { username, password });
+            const response = await axiosInstance.post('/users/login', { username, password });
             const userToken = response.data.token;
             await saveToSecureStore('token', userToken);
             setToken(userToken);
@@ -37,9 +38,13 @@ export const AuthProvider = ({ children }) => {
         setIsLoggedIn(false);
     };
 
+    logoutCallback = logout;
+
     return (
         <AuthContext.Provider value={{ isLoggedIn, token, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
 };
+
+export const getLogout = () => logoutCallback;

@@ -1,7 +1,23 @@
 const app = require('./src/app');
+const os = require('os');
 
 const PORT = process.env.PORT || 3007;
 
+// Function to get the local IP address
+const getLocalIpAddress = () => {
+    const networkInterfaces = os.networkInterfaces();
+    for (const interfaceName in networkInterfaces) {
+        for (const net of networkInterfaces[interfaceName]) {
+            if (net.family === 'IPv4' && !net.internal) {
+                return net.address; // Return the first external IPv4 address
+            }
+        }
+    }
+    return 'localhost'; // Fallback to localhost if no external IP is found
+};
+
+const localIp = getLocalIpAddress();
+
 app.listen(PORT, () => {
-    console.log(`Server running at http://192.168.1.202:${PORT}`);
+    console.log(`Server running at http://${localIp}:${PORT}`);
 });

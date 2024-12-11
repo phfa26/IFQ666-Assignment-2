@@ -15,20 +15,24 @@ const EntryModal = ({ visible, onClose, entry, onSave, onDelete }) => {
     const [newResponse, setNewResponse] = useState('');
     const [randomQuestion, setRandomQuestion] = useState(''); // Store random question for new entry
 
+    const generateRandomQuestion = () => {
+        const randomIndex = Math.floor(Math.random() * questions.length);
+        setRandomQuestion(questions[randomIndex]);
+    };
+
     useEffect(() => {
         if (entry) {
             // If editing an existing entry
-            setEditResponse(entry.response); // Set response for editing
-        } else {
-            // If adding a new entry, generate a random question
-            const randomIndex = Math.floor(Math.random() * questions.length);
-            setRandomQuestion(questions[randomIndex]);
+            setEditResponse(entry.response);
+        } else if (visible) {
+            // Generate a new random question only when modal is opened for a new entry
+            generateRandomQuestion();
         }
-    }, [entry]);
+    }, [entry, visible]);
 
     const clearResponses = (editRes) => {
         editRes ? setEditResponse('') : setNewResponse('');
-    }
+    };
 
     const handleSave = () => {
         if ((entry ? editResponse : newResponse).length < 10) {
@@ -37,8 +41,8 @@ const EntryModal = ({ visible, onClose, entry, onSave, onDelete }) => {
         }
 
         const newEntry = entry
-            ? { ...entry, response: editResponse }  // For editing
-            : {response: newResponse,  question: randomQuestion };  // For new entry
+            ? { ...entry, response: editResponse } // For editing
+            : { response: newResponse, question: randomQuestion }; // For new entry
 
         onSave(newEntry, clearResponses); // Pass to parent
         onClose(); // Close the modal
@@ -65,7 +69,7 @@ const EntryModal = ({ visible, onClose, entry, onSave, onDelete }) => {
                         </Text>
                         <TextInput
                             label="Response"
-                            value={ entry ? editResponse : newResponse}
+                            value={entry ? editResponse : newResponse}
                             onChangeText={entry ? setEditResponse : setNewResponse}
                             multiline
                             style={styles.input}

@@ -1,11 +1,11 @@
-import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import { getLogout } from '../contexts/AuthContext';
 
 // Create an axios instance
 const axiosInstance = axios.create({
-    baseURL: 'http://192.168.1.202:3007/api',  // Replace with your base URL
-});
+    baseURL: `http://${window.location.hostname}:3007/api`, // Dynamically set the hostname
+})
 
 // Intercept all requests and add the token to headers if available
 axiosInstance.interceptors.request.use(
@@ -31,10 +31,11 @@ axiosInstance.interceptors.response.use(
         // Handle token expiration (status code 401)
         if (error.response && error.response.status === 401) {
             if (error.response.data.error === 'Token expired. Please log in again.') {
-                // Token expired, logout the user
-                await SecureStore.deleteItemAsync('token');  // Clear the token
-                const navigation = useNavigation();
-                navigation.replace('Login');  // Navigate to login screen
+                const logout  = getLogout();
+                if (logout) await logout();
+                // // Token expired, logout the user
+                // const navigation = useNavigation();
+                // navigation.replace('Login');  // Navigate to login screen
             }
         }
         // Handle other errors
