@@ -27,6 +27,12 @@ export const AuthProvider = ({ children }) => {
             await saveToSecureStore('token', userToken);
             setToken(userToken);
             setIsLoggedIn(true);
+
+            const settingsResponse = await axiosInstance.get('/settings');
+            const { font_size } = settingsResponse.data;
+
+            await saveToSecureStore('fontSize', font_size.toString());
+
         } catch (error) {
             throw new Error('Invalid username or password');
         }

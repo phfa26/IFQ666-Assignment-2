@@ -1,35 +1,38 @@
 import React from 'react';
 import { Linking, StyleSheet, View } from 'react-native';
 import { Button, Text, useTheme } from 'react-native-paper';
+import { useFontSize } from '../contexts/FontSizeContext'; // Import FontSizeContext
 
 const AboutPage = () => {
     const { colors } = useTheme(); // Access the current theme colors
+    const { fontSize } = useFontSize(); // Access global font size
+
+    // Pass fontSize and theme colors to the styles
+    const styles = getStyles(fontSize, colors);
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <Text style={[styles.title, { color: colors.primary }]}>About Daily Reflection Journal</Text>
-            <Text style={[styles.text, { color: colors.onBackground }]}>
+        <View style={styles.container}>
+            <Text style={styles.title}>About Daily Reflection Journal</Text>
+            <Text style={styles.text}>
                 The Daily Reflection Journal app is designed to encourage mindfulness and gratitude by helping users
                 reflect on their day. Answer one thought-provoking question each day and look back at your responses to
                 track your growth and journey.
             </Text>
 
-            <Text style={[styles.subtitle, { color: colors.primary }]}>Acknowledgments</Text>
-            <Text style={[styles.text, { color: colors.onBackground }]}>
-                This app was built using the following open-source technologies:
-            </Text>
-            <Text style={[styles.listItem, { color: colors.onBackground }]}>- React Native</Text>
-            <Text style={[styles.listItem, { color: colors.onBackground }]}>- React Native Paper</Text>
-            <Text style={[styles.listItem, { color: colors.onBackground }]}>- Axios</Text>
+            <Text style={styles.subtitle}>Acknowledgments</Text>
+            <Text style={styles.text}>This app was built using the following open-source technologies:</Text>
+            <Text style={styles.listItem}>- React Native</Text>
+            <Text style={styles.listItem}>- React Native Paper</Text>
+            <Text style={styles.listItem}>- Axios</Text>
 
-            <Text style={[styles.subtitle, { color: colors.primary }]}>Version</Text>
-            <Text style={[styles.text, { color: colors.onBackground }]}>Version 1.0.0</Text>
+            <Text style={styles.subtitle}>Version</Text>
+            <Text style={styles.text}>Version 1.0.0</Text>
 
             <Button
                 mode="outlined"
                 onPress={() => Linking.openURL('https://github.com/phfa26/IFQ666-Assignment-2')}
-                style={[styles.button, { borderColor: colors.primary }]}
-                labelStyle={{ color: colors.primary }}
+                style={styles.button}
+                labelStyle={styles.buttonLabel}
             >
                 View Source Code
             </Button>
@@ -37,35 +40,46 @@ const AboutPage = () => {
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    subtitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginTop: 20,
-        marginBottom: 10,
-    },
-    text: {
-        fontSize: 16,
-        lineHeight: 24,
-        marginBottom: 10,
-    },
-    listItem: {
-        fontSize: 16,
-        marginLeft: 10,
-        lineHeight: 24,
-    },
-    button: {
-        marginTop: 20,
-    },
-});
+// Dynamically generate styles based on fontSize and colors
+const getStyles = (fontSize, colors) =>
+    StyleSheet.create({
+        container: {
+            flex: 1,
+            padding: 20,
+            backgroundColor: colors.background,
+        },
+        title: {
+            fontSize: fontSize + 8,
+            fontWeight: 'bold',
+            marginBottom: 20,
+            color: colors.primary,
+        },
+        subtitle: {
+            fontSize: fontSize + 2,
+            fontWeight: 'bold',
+            marginTop: 20,
+            marginBottom: 10,
+            color: colors.primary,
+        },
+        text: {
+            fontSize,
+            lineHeight: fontSize * 1.5,
+            marginBottom: 10,
+            color: colors.onBackground,
+        },
+        listItem: {
+            fontSize,
+            marginLeft: 10,
+            lineHeight: fontSize * 1.5,
+            color: colors.onBackground,
+        },
+        button: {
+            marginTop: 20,
+            borderColor: colors.primary,
+        },
+        buttonLabel: {
+            color: colors.primary,
+        },
+    });
 
 export default AboutPage;

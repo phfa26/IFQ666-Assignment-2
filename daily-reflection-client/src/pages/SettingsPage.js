@@ -1,13 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { Button, Switch, Text, TextInput, useTheme } from 'react-native-paper';
+import { Button, Switch, Text, TextInput } from 'react-native-paper';
 import { AuthContext } from '../contexts/AuthContext';
+import { useFontSize } from '../contexts/FontSizeContext';
 import { ThemeContext } from '../contexts/ThemeContext';
 import axiosInstance from '../utils/axiosInstance'; // Use the axiosInstance
 
 
 const SettingsPage = () => {
-    const { toggleTheme, isDarkMode, updateFontSize } = useContext(ThemeContext);;
+    const { toggleTheme, isDarkMode } = useContext(ThemeContext);;
     const { logout } = useContext(AuthContext);
 
     const [reminderTime, setReminderTime] = useState('09:00');
@@ -15,7 +16,7 @@ const SettingsPage = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState('');
 
-    const { fontSize, colors } = useTheme();
+   const { fontSize, updateFontSize } = useFontSize();
 
     // Fetch current settings from the API
     const fetchSettings = async () => {
