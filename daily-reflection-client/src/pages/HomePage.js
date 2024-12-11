@@ -137,7 +137,7 @@ const HomePage = () => {
             {error && <Text style={styles.errorText}>{error}</Text>}
 
             {!loading && !error && (
-                <ScrollView style={styles.scrollView}>
+                <ScrollView style={styles.scrollView} key={colors.background}>
                     {entries.length === 0 ? (
                         <Text style={styles.errorText}>No entries available</Text>
                     ) : (

@@ -92,7 +92,7 @@ const SettingsPage = () => {
                         <Button mode="outlined" onPress={() => updateFontSize(Math.max(fontSize - 1, 16))}>
                             -
                         </Button>
-                        <Button mode="outlined" onPress={() => updateFontSize(Math.min(fontSize + 1, 24))}>
+                        <Button mode="outlined" onPress={() => updateFontSize(Math.min(fontSize + 1, 20))}>
                             +
                         </Button>
                     </View>
