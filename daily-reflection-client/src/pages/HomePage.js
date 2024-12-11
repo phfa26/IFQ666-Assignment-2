@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Card, Text, useTheme } from 'react-native-paper';
 import EntryModal from '../components/EntryModal'; // Import the EntryModal for editing and adding entries
+import { useFontSize } from '../contexts/FontSizeContext'; // Access FontSizeProvider
 import axiosInstance from '../utils/axiosInstance'; // Use the axiosInstance
 
 const HomePage = () => {
@@ -11,15 +12,17 @@ const HomePage = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [selectedEntry, setSelectedEntry] = useState(null); // Store selected entry for editing
-    
-    const { colors } = useTheme(); // Access the theme colors
-    const styles = useDynamicStyles(colors);
+
+    const { fontSize } = useFontSize(); // Access global font size
+    const { colors } = useTheme(); // Access theme colors
+
+    const styles = useMemo(() => getDynamicStyles(fontSize, colors), [fontSize, colors]); // Generate styles dynamically
 
     const fetchEntries = async () => {
         try {
             setLoading(true);
             setError('');
-            const response = await axiosInstance.get('/entries');  // Use axiosInstance
+            const response = await axiosInstance.get('/entries'); // Use axiosInstance
             // Sort entries by date (most recent first)
             const sortedEntries = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             setEntries(sortedEntries);
@@ -31,7 +34,7 @@ const HomePage = () => {
         }
     };
 
-    const saveEntry = async ({response, question}, clearResponses) => {
+    const saveEntry = async ({ response, question }, clearResponses) => {
         try {
             // Check if we are editing an existing entry or adding a new one
             if (selectedEntry) {
@@ -53,7 +56,7 @@ const HomePage = () => {
             // After saving, reset the modal and state
             setModalVisible(false);
             clearResponses(!!selectedEntry);
-            setSelectedEntry(null);  // Reset selected entry
+            setSelectedEntry(null); // Reset selected entry
             fetchEntries(); // Refresh the entries after saving
         } catch (error) {
             console.error('Failed to save entry:', error);
@@ -106,12 +109,12 @@ const HomePage = () => {
     }, []);
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.container}>
             <Button
                 mode="contained"
                 onPress={() => openModal(null)}
-                style={[styles.addButton, { backgroundColor: colors.primary }]}
-                labelStyle={{ color: colors.onPrimary }}
+                style={styles.addButton}
+                labelStyle={styles.buttonLabel}
             >
                 Add New Entry
             </Button>
@@ -121,37 +124,37 @@ const HomePage = () => {
                 onClose={() => setModalVisible(false)}
                 entry={selectedEntry}
                 onSave={saveEntry}
-                onDelete={handleDeleteEntry}  // Pass the handleDeleteEntry function as a prop to the modal
+                onDelete={handleDeleteEntry} // Pass the handleDeleteEntry function as a prop to the modal
             />
 
             {loading && (
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color={colors.primary} />
-                    <Text style={{ color: colors.onBackground }}>Loading Entries...</Text>
+                    <Text style={styles.loadingText}>Loading Entries...</Text>
                 </View>
             )}
 
-            {error && <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>}
+            {error && <Text style={styles.errorText}>{error}</Text>}
 
             {!loading && !error && (
-                <ScrollView key={colors.background} style={styles.scrollView}>
+                <ScrollView style={styles.scrollView}>
                     {entries.length === 0 ? (
-                        <Text style={[styles.errorText, { color: colors.onBackground }]}>No entries available</Text>
+                        <Text style={styles.errorText}>No entries available</Text>
                     ) : (
                         entries.map((entry, index) => (
                             <Card
                                 key={index}
-                                style={[styles.entryCard, { backgroundColor: colors.surface }]}
+                                style={styles.entryCard}
                                 onPress={() => openModal(entry)}
                             >
                                 <Card.Title
                                     title={entry.question}
                                     subtitle={entry.date}
-                                    titleStyle={{ color: colors.primary }}
-                                    subtitleStyle={{ color: colors.onBackground }}
+                                    titleStyle={styles.cardTitle}
+                                    subtitleStyle={styles.cardSubtitle}
                                 />
                                 <Card.Content>
-                                    <Text style={{ color: colors.onBackground }}>{entry.response}</Text>
+                                    <Text style={styles.cardContent}>{entry.response}</Text>
                                 </Card.Content>
                             </Card>
                         ))
@@ -162,7 +165,7 @@ const HomePage = () => {
     );
 };
 
-const useDynamicStyles = (colors) =>
+const getDynamicStyles = (fontSize, colors) =>
     StyleSheet.create({
         container: {
             flex: 1,
@@ -173,6 +176,11 @@ const useDynamicStyles = (colors) =>
             marginBottom: 10,
             backgroundColor: colors.primary,
         },
+        buttonLabel: {
+            fontSize,
+            lineHeight: fontSize * 1.2,
+            color: colors.onPrimary,
+        },
         scrollView: {
             flex: 1,
         },
@@ -180,14 +188,30 @@ const useDynamicStyles = (colors) =>
             marginBottom: 10,
             backgroundColor: colors.surface,
         },
+        cardTitle: {
+            fontSize: fontSize + 2,
+            color: colors.primary,
+        },
+        cardSubtitle: {
+            fontSize,
+            color: colors.onBackground,
+        },
+        cardContent: {
+            fontSize,
+            color: colors.onBackground,
+        },
         loadingContainer: {
             flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
         },
+        loadingText: {
+            fontSize,
+            color: colors.onBackground,
+        },
         errorText: {
+            fontSize,
             textAlign: 'center',
-            marginVertical: 10,
             color: colors.error,
         },
     });

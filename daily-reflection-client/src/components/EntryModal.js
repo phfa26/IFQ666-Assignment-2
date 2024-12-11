@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Keyboard, Modal, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import { Button, Card, Text, TextInput } from 'react-native-paper';
+import { useFontSize } from '../contexts/FontSizeContext';
 
 const questions = [
     "What made you smile today?",
@@ -11,9 +12,12 @@ const questions = [
 ];
 
 const EntryModal = ({ visible, onClose, entry, onSave, onDelete }) => {
+    const { fontSize } = useFontSize(); // Access global font size
     const [editResponse, setEditResponse] = useState('');
     const [newResponse, setNewResponse] = useState('');
     const [randomQuestion, setRandomQuestion] = useState(''); // Store random question for new entry
+
+    const styles = useMemo(() => getStyles(fontSize), [fontSize]); // Generate styles dynamically
 
     const generateRandomQuestion = () => {
         const randomIndex = Math.floor(Math.random() * questions.length);
@@ -68,21 +72,33 @@ const EntryModal = ({ visible, onClose, entry, onSave, onDelete }) => {
                             {entry ? entry.question : randomQuestion}
                         </Text>
                         <TextInput
-                            label="Response"
                             value={entry ? editResponse : newResponse}
                             onChangeText={entry ? setEditResponse : setNewResponse}
                             multiline
                             style={styles.input}
+                            labelStyle={styles.buttonLabel}
                         />
-                        <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
+                        <Button
+                            mode="contained"
+                            onPress={handleSave}
+                            style={styles.saveButton}
+                            labelStyle={styles.buttonLabel}
+                        >
                             {entry ? 'Save Changes' : 'Add Entry'}
                         </Button>
                         {entry && (
-                            <Button mode="outlined" onPress={handleDelete} style={styles.deleteButton}>
+                            <Button
+                                mode="outlined"
+                                onPress={handleDelete}
+                                style={styles.deleteButton}
+                                labelStyle={styles.buttonLabel}
+                            >
                                 Delete Entry
                             </Button>
                         )}
-                        <Button onPress={onClose}>Close</Button>
+                        <Button onPress={onClose} style={styles.closeButton} labelStyle={styles.buttonLabel}>
+                            Close
+                        </Button>
                     </Card>
                 </View>
             </TouchableWithoutFeedback>
@@ -90,14 +106,21 @@ const EntryModal = ({ visible, onClose, entry, onSave, onDelete }) => {
     );
 };
 
-const styles = StyleSheet.create({
-    modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
-    modalCard: { width: '90%', padding: 20 },
-    modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
-    modalQuestion: { fontSize: 16, fontWeight: 'normal', marginBottom: 10 },
-    input: { marginBottom: 15 },
-    saveButton: { marginBottom: 10 },
-    deleteButton: { marginBottom: 10, color: 'red' },
-});
+const getStyles = (fontSize) =>
+    StyleSheet.create({
+        modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
+        modalCard: { width: '90%', padding: fontSize },
+        modalTitle: { fontSize: fontSize + 2, fontWeight: 'bold', marginBottom: fontSize / 2 },
+        modalQuestion: { fontSize, fontWeight: 'normal', marginBottom: fontSize / 2 },
+        input: {
+            fontSize,
+            marginBottom: fontSize,
+            lineHeight: fontSize * 1.2,
+        },
+        saveButton: { marginBottom: fontSize / 2 },
+        deleteButton: { marginBottom: fontSize / 2 },
+        closeButton: { marginBottom: fontSize / 2 },
+        buttonLabel: { fontSize, lineHeight: fontSize * 1.2 },
+    });
 
 export default EntryModal;
