@@ -1,6 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import axiosInstance from '../utils/axiosInstance';
+import { getFromSecureStore, saveToSecureStore } from '../utils/secureStore';
 
 const FontSizeContext = createContext();
 
@@ -14,11 +14,11 @@ export const FontSizeProvider = ({ children }) => {
             const { font_size } = response.data;
             const size = font_size || 16;
             setFontSize(size);
-            await AsyncStorage.setItem('fontSize', size.toString()); // Update local storage
+            await saveToSecureStore('fontSize', size.toString()); // Update local storage
         } catch (error) {
             console.error('Failed to fetch font size:', error);
             // Fallback to stored local value
-            const storedSize = await AsyncStorage.getItem('fontSize');
+            const storedSize = await getFromSecureStore('fontSize');
             if (storedSize) {
                 setFontSize(Number(storedSize));
             }
@@ -28,7 +28,7 @@ export const FontSizeProvider = ({ children }) => {
     const updateFontSize = async (size) => {
         try {
             setFontSize(size);
-            await AsyncStorage.setItem('fontSize', size.toString()); // Update local storage
+            await saveToSecureStore('fontSize', size.toString()); // Update local storage
             await axiosInstance.put('/settings', { font_size: size }); // Update server
         } catch (error) {
             console.error('Failed to update font size:', error);

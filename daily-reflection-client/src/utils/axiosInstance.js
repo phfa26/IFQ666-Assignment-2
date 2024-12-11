@@ -4,7 +4,7 @@ import { getLogout } from '../contexts/AuthContext';
 
 // Create an axios instance
 const axiosInstance = axios.create({
-    baseURL: `http://${window.location.hostname}:3007/api`, // Dynamically set the hostname
+    baseURL: `http://192.168.1.204:3007/api`,
 })
 
 // Intercept all requests and add the token to headers if available

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Linking, StyleSheet, View } from 'react-native';
+import { Linking, ScrollView, StyleSheet } from 'react-native';
 import { Button, Text, useTheme } from 'react-native-paper';
 import { useFontSize } from '../contexts/FontSizeContext'; // Import FontSizeContext
 
@@ -11,7 +11,7 @@ const AboutPage = () => {
     const styles = getStyles(fontSize, colors);
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <Text style={styles.title}>About Daily Reflection Journal</Text>
             <Text style={styles.text}>
                 The Daily Reflection Journal app is designed to encourage mindfulness and gratitude by helping users
@@ -36,7 +36,7 @@ const AboutPage = () => {
             >
                 View Source Code
             </Button>
-        </View>
+        </ScrollView>
     );
 };
 
@@ -45,7 +45,7 @@ const getStyles = (fontSize, colors) =>
     StyleSheet.create({
         container: {
             flex: 1,
-            padding: 20,
+            padding: 30,
             backgroundColor: colors.background,
         },
         title: {
@@ -75,10 +75,11 @@ const getStyles = (fontSize, colors) =>
         },
         button: {
             marginTop: 20,
-            borderColor: colors.primary,
         },
         buttonLabel: {
-            color: colors.primary,
+            fontSize,
+            lineHeight: fontSize * 1.2,
+            color: colors.secondary,
         },
     });
 
