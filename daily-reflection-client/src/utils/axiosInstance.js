@@ -2,9 +2,11 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { getLogout } from '../contexts/AuthContext';
 
+const baseURL = `http://${process.env.SERVER_ENDPOINT}/api`
+
 // Create an axios instance
 const axiosInstance = axios.create({
-    baseURL: `http://192.168.1.204:3007/api`,
+    baseURL,
 })
 
 // Intercept all requests and add the token to headers if available

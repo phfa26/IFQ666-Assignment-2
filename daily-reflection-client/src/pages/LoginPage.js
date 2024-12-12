@@ -17,7 +17,6 @@ const LoginPage = ({ navigation }) => {
     // Handle login functionality
     const handleLogin = async () => {
         try {
-            console
             await login(username, password);
             navigation.replace('Home');
         } catch (err) {

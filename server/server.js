@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const app = require('./src/app');
 const os = require('os');
 
@@ -17,6 +19,18 @@ const getLocalIpAddress = () => {
 };
 
 const localIp = getLocalIpAddress();
+
+// Write the IP to the .env file
+const envFilePath = path.resolve(__dirname, '../daily-reflection-client/.env');
+const envVar = `SERVER_ENDPOINT=${localIp}:${PORT}`;
+
+fs.writeFile(envFilePath, envVar, { flag: 'w' }, (err) => {
+    if (err) {
+        console.error('Error SERVER_ENDPOINT writing to .env file:', err);
+    } else {
+        console.log(`IP address ${localIp} written to .env file at ${envFilePath} as SERVER_ENDPOINT`);
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`Server running at http://${localIp}:${PORT}`);
